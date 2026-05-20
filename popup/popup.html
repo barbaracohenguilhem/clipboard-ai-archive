@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Clipboard</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <input id="search" type="search" placeholder="Search clipboard…" autocomplete="off" />
+      <div id="filters" role="tablist"></div>
+    </header>
+    <main>
+      <ul id="clip-list"></ul>
+      <p id="empty" hidden>Nothing yet. Copy something to get started.</p>
+    </main>
+    <footer>
+      <button id="open-panel" type="button">Open full view</button>
+      <button id="pause" type="button">Pause</button>
+      <button id="settings" type="button">Settings</button>
+    </footer>
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
