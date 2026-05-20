@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Clipboard AI Archive",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Privacy-first clipboard archive with on-device AI categorization.",
   "background": {
     "service_worker": "background/service-worker.js",
@@ -27,11 +27,17 @@
   "side_panel": {
     "default_path": "sidepanel/sidepanel.html"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/copy-listener.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
   "permissions": [
-    "clipboardRead",
     "clipboardWrite",
     "storage",
-    "offscreen",
     "sidePanel",
     "notifications",
     "activeTab",
@@ -48,5 +54,5 @@
       "description": "Open clipboard archive"
     }
   },
-  "minimum_chrome_version": "127"
+  "minimum_chrome_version": "116"
 }

@@ -2,30 +2,13 @@ import { processClipboardEvent } from './capture-pipeline.js';
 import { tagClip } from './tagger.js';
 import { runRetention } from './retention.js';
 import { listRecent, deleteClip, updateTags, setPinned } from './storage.js';
+import { sha1 } from '../shared/hash.js';
 import {
   MSG,
   SETTINGS_KEY,
   DEFAULT_SETTINGS,
   PAUSE_STATE_KEY,
 } from '../shared/messages.js';
-
-const OFFSCREEN_URL = chrome.runtime.getURL('offscreen/offscreen.html');
-
-async function ensureOffscreen() {
-  if (chrome.offscreen?.hasDocument && (await chrome.offscreen.hasDocument())) {
-    return;
-  }
-  try {
-    await chrome.offscreen.createDocument({
-      url: OFFSCREEN_URL,
-      reasons: ['CLIPBOARD'],
-      justification: 'Poll clipboard for archive capture',
-    });
-  } catch (err) {
-    // Likely "Only a single offscreen document may be created" if hasDocument is missing
-    console.warn('offscreen create:', err.message);
-  }
-}
 
 async function getSettings() {
   const stored = await chrome.storage.local.get(SETTINGS_KEY);
@@ -57,34 +40,20 @@ async function broadcast(type, payload) {
   }
 }
 
-async function getActiveTabContext() {
-  try {
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true,
-    });
-    return {
-      source_url: tab?.url || null,
-      source_title: tab?.title || null,
-    };
-  } catch {
-    return { source_url: null, source_title: null };
-  }
-}
-
-async function handleClipboardChange({ text, html, hash }) {
+async function handleClipboardChange({ text, html, source_url, source_title }) {
   const { paused } = await getPauseState();
   if (paused) return;
+  if (!text) return;
 
   const settings = await getSettings();
-  const context = await getActiveTabContext();
+  const hash = await sha1(text);
 
   const result = await processClipboardEvent({
     text,
     html,
     hash,
-    source_url: context.source_url,
-    source_title: context.source_title,
+    source_url: source_url || null,
+    source_title: source_title || null,
     blocklist:
       settings.blocklist && settings.blocklist.length > 0
         ? settings.blocklist
@@ -167,12 +136,9 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
 });
 
-chrome.runtime.onInstalled.addListener(async () => {
-  await ensureOffscreen();
+chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create('retention', { periodInMinutes: 60 * 24 });
 });
-
-chrome.runtime.onStartup.addListener(ensureOffscreen);
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === 'retention') {
@@ -181,7 +147,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 });
 
-// Side panel opens via popup or via API, not via action click (action opens popup).
 chrome.sidePanel
   ?.setPanelBehavior?.({ openPanelOnActionClick: false })
   .catch(() => {});
