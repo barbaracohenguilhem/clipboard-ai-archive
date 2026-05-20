@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Clipboard Archive — Settings</title>
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Clipboard Archive</h1>
+      <p class="subtle">Privacy-first clipboard history with on-device AI tagging.</p>
+
+      <section>
+        <h2>Capture</h2>
+        <div class="row">
+          <label for="retention">Auto-delete unpinned clips after</label>
+          <select id="retention">
+            <option value="30">30 days</option>
+            <option value="90" selected>90 days</option>
+            <option value="180">180 days</option>
+            <option value="365">1 year</option>
+            <option value="">Never</option>
+          </select>
+        </div>
+        <div class="row">
+          <label class="inline">
+            <input type="checkbox" id="ai-enabled" checked />
+            Use on-device AI for topic tagging (Gemini Nano)
+          </label>
+        </div>
+        <div class="row">
+          <label for="blocklist">Blocked domains (one per line)</label>
+          <textarea id="blocklist" rows="5" placeholder="example.com&#10;internal-bank.example.com"></textarea>
+          <p class="hint">Clipboard content from these domains is never captured. Password manager and bank domains are always blocked by default.</p>
+        </div>
+        <div class="row">
+          <button id="save" type="button" class="primary">Save</button>
+          <span id="saved" hidden>Saved ✓</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>Data</h2>
+        <div class="row buttons">
+          <button id="export" type="button">Export all as JSON</button>
+          <button id="import" type="button">Import from JSON</button>
+          <input id="import-file" type="file" accept="application/json" hidden />
+        </div>
+        <div class="row">
+          <button id="delete-all" type="button" class="danger">Delete all clipboard history</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>About</h2>
+        <p class="subtle">
+          Keyboard shortcut: <kbd>Cmd/Ctrl + Shift + V</kbd> opens the popup.
+          Change it in <a href="chrome://extensions/shortcuts" target="_blank">chrome://extensions/shortcuts</a>.
+        </p>
+      </section>
+    </main>
+    <script type="module" src="settings.js"></script>
+  </body>
+</html>
