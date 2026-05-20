@@ -2,6 +2,22 @@ import { looksLikeSecret, DEFAULT_BLOCKLIST } from '../shared/secrets.js';
 import { classifyType } from '../shared/classifier.js';
 import { addClip, findByHash } from './storage.js';
 
+const MAX_CLIP_BYTES = 100 * 1024; // 100KB
+
+// Strip <script>, <style>, and inline event handlers from HTML before storage.
+// We don't render this HTML (we treat it as text), but we sanitize anyway as
+// defense-in-depth in case a future feature renders it (e.g., HTML preview tab).
+function sanitizeHtml(html) {
+  if (!html || typeof html !== 'string') return null;
+  return html
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, '')
+    .replace(/\son\w+\s*=\s*"[^"]*"/gi, '')
+    .replace(/\son\w+\s*=\s*'[^']*'/gi, '')
+    .replace(/\son\w+\s*=\s*[^\s>]+/gi, '')
+    .replace(/javascript\s*:/gi, '');
+}
+
 export async function processClipboardEvent({
   text,
   html,
@@ -10,8 +26,12 @@ export async function processClipboardEvent({
   source_title,
   blocklist = DEFAULT_BLOCKLIST,
 } = {}) {
-  if (!text || typeof text !== 'string') {
+  if (typeof text !== 'string' || text.trim().length === 0) {
     return { stored: false, reason: 'empty' };
+  }
+
+  if (text.length > MAX_CLIP_BYTES) {
+    return { stored: false, reason: 'too_large' };
   }
 
   const existing = await findByHash(hash);
@@ -31,10 +51,11 @@ export async function processClipboardEvent({
   }
 
   const type = classifyType(text);
+  const cleanHtml = sanitizeHtml(html);
 
   const id = await addClip({
     text,
-    html: html || null,
+    html: cleanHtml,
     hash,
     type,
     tags: [],
