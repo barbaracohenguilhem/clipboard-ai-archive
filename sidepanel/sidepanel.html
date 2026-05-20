@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Clipboard Archive</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <aside id="rail">
+      <h3>Types</h3>
+      <ul id="type-list"></ul>
+      <h3>Tags</h3>
+      <ul id="tag-list"></ul>
+      <label class="pinned-toggle">
+        <input type="checkbox" id="pinned-only" /> Pinned only
+      </label>
+    </aside>
+    <section id="list-pane">
+      <input id="search" type="search" placeholder="Search…" autocomplete="off" />
+      <ul id="clips"></ul>
+    </section>
+    <section id="detail">
+      <p id="placeholder">Select a clip to view details</p>
+      <div id="detail-content" hidden>
+        <pre id="d-text"></pre>
+        <p id="d-source"></p>
+        <p id="d-date"></p>
+        <div id="d-tags"></div>
+        <input id="d-tag-input" placeholder="Add tag and press Enter" />
+        <div class="detail-buttons">
+          <button id="d-pin" type="button">Pin</button>
+          <button id="d-copy" type="button">Copy</button>
+          <button id="d-delete" type="button" class="danger">Delete</button>
+        </div>
+      </div>
+    </section>
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>
