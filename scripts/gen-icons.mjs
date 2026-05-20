@@ -1,43 +1,55 @@
-// Generates minimal placeholder PNGs (solid blue squares with rounded corners
-// can't be easily encoded without a PNG lib, so we ship a tiny solid blue PNG
-// for each size; Chrome will scale it). Replace with a real designed icon later.
+// Generates icon-{16,32,48,128}.png from assets/icon.svg using sharp.
+// Run with: node scripts/gen-icons.mjs
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outDir = path.join(__dirname, '..', 'assets', 'icons');
+const root = path.join(__dirname, '..');
+const svgPath = path.join(root, 'assets', 'icon.svg');
+const outDir = path.join(root, 'assets', 'icons');
+
 fs.mkdirSync(outDir, { recursive: true });
+const svg = fs.readFileSync(svgPath);
 
-// 16x16 PNG, solid #2b6cff. Generated once and inlined below.
-// (Pre-computed PNG so this script has no external deps.)
-const PNG_16 =
-  'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGElEQVR4nGNgGAW' +
-  'jYBSMglEwCkbBKBgFowAAEEAAAaCnnY8AAAAASUVORK5CYII=';
-// 32x32 PNG, solid #2b6cff
-const PNG_32 =
-  'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAHElEQVRYhe3BAQ' +
-  'EAAACCIP+vbkhAAQAAAADwGEACgAEBUu7HzgAAAABJRU5ErkJggg==';
-// 48x48 PNG, solid #2b6cff
-const PNG_48 =
-  'iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAKElEQVRoge3BAQ' +
-  'EAAACCIP+vbkhQAQAAAAAAAAAAAAAAAAAAAOBpQGEAAfvqglAAAAAASUVORK5C' +
-  'YII=';
-// 128x128 PNG, solid #2b6cff
-const PNG_128 =
-  'iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAVUlEQVR4nO3BMQ' +
-  'EAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
-  'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAdwMTSAABx30JJwAAAABJRU5ErkJggg==';
+const SIZES = [16, 32, 48, 128];
 
-const FILES = {
-  'icon-16.png': PNG_16,
-  'icon-32.png': PNG_32,
-  'icon-48.png': PNG_48,
-  'icon-128.png': PNG_128,
-};
-
-for (const [name, b64] of Object.entries(FILES)) {
-  fs.writeFileSync(path.join(outDir, name), Buffer.from(b64, 'base64'));
+for (const size of SIZES) {
+  const outPath = path.join(outDir, `icon-${size}.png`);
+  await sharp(svg)
+    .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png()
+    .toFile(outPath);
+  console.log(`✓ ${outPath} (${size}×${size})`);
 }
-console.log(`Wrote ${Object.keys(FILES).length} icons to ${outDir}`);
+
+// Also write a 440x280 promotional tile for the Chrome Web Store listing.
+// Centered icon on the brand background.
+const promoPath = path.join(root, 'assets', 'promo-440x280.png');
+const promoBg = Buffer.from(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 280" width="440" height="280">
+     <defs>
+       <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+         <stop offset="0%" stop-color="#3b7bff"/>
+         <stop offset="100%" stop-color="#1f4fcc"/>
+       </linearGradient>
+     </defs>
+     <rect width="440" height="280" fill="url(#g)"/>
+     <text x="220" y="220" font-family="system-ui, -apple-system, sans-serif"
+           font-size="22" font-weight="600" fill="white" text-anchor="middle">
+       Clipboard AI Archive
+     </text>
+     <text x="220" y="248" font-family="system-ui, -apple-system, sans-serif"
+           font-size="13" fill="white" fill-opacity="0.85" text-anchor="middle">
+       Private clipboard history with on-device AI
+     </text>
+   </svg>`
+);
+const iconAt140 = await sharp(svg).resize(140, 140).png().toBuffer();
+await sharp(promoBg)
+  .composite([{ input: iconAt140, top: 30, left: 150 }])
+  .png()
+  .toFile(promoPath);
+console.log(`✓ ${promoPath} (promo tile)`);
