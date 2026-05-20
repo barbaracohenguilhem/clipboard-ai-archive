@@ -11,13 +11,21 @@
       <div id="filters" role="tablist"></div>
     </header>
     <main>
-      <ul id="clip-list"></ul>
-      <p id="empty" hidden>Nothing yet. Copy something to get started.</p>
+      <ul id="clip-list" aria-label="Recent clipboard items"></ul>
+      <div id="empty" hidden>
+        <p class="empty-title">No clips yet</p>
+        <p class="empty-hint">Copy text on any web page and it'll appear here.</p>
+        <p class="empty-hint subtle">Just installed? Reload the tabs where you want to copy.</p>
+      </div>
+      <div id="paused-banner" hidden>
+        <span>⏸ Capture is paused</span>
+        <button id="resume-banner" type="button" class="link">Resume</button>
+      </div>
     </main>
     <footer>
-      <button id="open-panel" type="button">Open full view</button>
-      <button id="pause" type="button">Pause</button>
-      <button id="settings" type="button">Settings</button>
+      <button id="open-panel" type="button" title="Open side panel">Open full view</button>
+      <button id="pause" type="button" title="Pause capture">Pause</button>
+      <button id="settings" type="button" title="Settings">Settings</button>
     </footer>
     <div id="toast" role="status" aria-live="polite" hidden></div>
     <script type="module" src="popup.js"></script>

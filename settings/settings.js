@@ -1,8 +1,10 @@
-import { SETTINGS_KEY, DEFAULT_SETTINGS } from '../shared/messages.js';
+import { SETTINGS_KEY, DEFAULT_SETTINGS, MSG } from '../shared/messages.js';
 
 const els = {
   retention: document.getElementById('retention'),
   aiEnabled: document.getElementById('ai-enabled'),
+  aiStatus: document.getElementById('ai-status'),
+  aiHelp: document.getElementById('ai-help'),
   blocklist: document.getElementById('blocklist'),
   save: document.getElementById('save'),
   saved: document.getElementById('saved'),
@@ -111,4 +113,23 @@ els.deleteAll.addEventListener('click', async () => {
   }
 });
 
+async function checkAiStatus() {
+  try {
+    const res = await chrome.runtime.sendMessage({ type: MSG.GET_AI_STATUS });
+    if (res?.available) {
+      els.aiStatus.textContent = 'available';
+      els.aiStatus.className = 'ai-status ok';
+      els.aiHelp.hidden = true;
+    } else {
+      els.aiStatus.textContent = 'not available';
+      els.aiStatus.className = 'ai-status missing';
+      els.aiHelp.hidden = false;
+    }
+  } catch {
+    els.aiStatus.textContent = 'unknown';
+    els.aiStatus.className = 'ai-status unknown';
+  }
+}
+
 loadSettings();
+checkAiStatus();

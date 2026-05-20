@@ -6,6 +6,8 @@ const state = {
   clips: [],
   filterType: 'All',
   query: '',
+  selectedIdx: 0,
+  paused: false,
 };
 
 const els = {
@@ -17,6 +19,8 @@ const els = {
   openPanel: document.getElementById('open-panel'),
   pause: document.getElementById('pause'),
   settings: document.getElementById('settings'),
+  pausedBanner: document.getElementById('paused-banner'),
+  resumeBanner: document.getElementById('resume-banner'),
 };
 
 function renderFilters() {
@@ -26,8 +30,11 @@ function renderFilters() {
     btn.type = 'button';
     btn.className = 'chip' + (t === state.filterType ? ' active' : '');
     btn.textContent = t;
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', String(t === state.filterType));
     btn.addEventListener('click', () => {
       state.filterType = t;
+      state.selectedIdx = 0;
       renderFilters();
       renderList();
     });
@@ -59,14 +66,28 @@ function filterClips() {
   });
 }
 
+async function copyClip(clip, closeAfter = false) {
+  try {
+    await navigator.clipboard.writeText(clip.text);
+    showToast('Copied!');
+  } catch {
+    showToast('Copy failed');
+  }
+  if (closeAfter) window.close();
+}
+
 function renderList() {
   const items = filterClips().slice(0, 20);
   els.empty.hidden = items.length > 0;
+  if (state.selectedIdx >= items.length) state.selectedIdx = Math.max(0, items.length - 1);
+
   els.list.innerHTML = '';
-  for (const clip of items) {
+  items.forEach((clip, i) => {
     const li = document.createElement('li');
-    li.className = 'clip';
+    li.className = 'clip' + (i === state.selectedIdx ? ' selected' : '');
     li.dataset.id = clip.id;
+    li.setAttribute('role', 'option');
+    li.tabIndex = -1;
 
     const meta = document.createElement('div');
     meta.className = 'clip-meta';
@@ -101,23 +122,33 @@ function renderList() {
       li.appendChild(src);
     }
 
-    li.addEventListener('click', async (e) => {
-      try {
-        await navigator.clipboard.writeText(clip.text);
-        showToast('Copied!');
-      } catch {
-        showToast('Copy failed');
-      }
-      if (e.shiftKey) window.close();
+    li.addEventListener('click', (e) => copyClip(clip, e.shiftKey));
+    li.addEventListener('mouseenter', () => {
+      state.selectedIdx = i;
+      updateSelectionHighlight();
     });
     els.list.appendChild(li);
-  }
+  });
+}
+
+function updateSelectionHighlight() {
+  const lis = els.list.querySelectorAll('.clip');
+  lis.forEach((li, i) =>
+    li.classList.toggle('selected', i === state.selectedIdx)
+  );
+  const sel = lis[state.selectedIdx];
+  sel?.scrollIntoView({ block: 'nearest' });
 }
 
 function showToast(msg) {
   els.toast.textContent = msg;
   els.toast.hidden = false;
   setTimeout(() => (els.toast.hidden = true), 1200);
+}
+
+function updatePauseUI() {
+  els.pause.textContent = state.paused ? 'Resume' : 'Pause';
+  els.pausedBanner.hidden = !state.paused;
 }
 
 async function loadClips() {
@@ -135,9 +166,37 @@ async function loadClips() {
   }
 }
 
+async function refreshPauseState() {
+  try {
+    const s = await chrome.runtime.sendMessage({ type: MSG.GET_PAUSE_STATE });
+    state.paused = !!s?.paused;
+    updatePauseUI();
+  } catch { /* ignore */ }
+}
+
 els.search.addEventListener('input', () => {
   state.query = els.search.value;
+  state.selectedIdx = 0;
   renderList();
+});
+
+els.search.addEventListener('keydown', (e) => {
+  const visibleCount = filterClips().slice(0, 20).length;
+  if (e.key === 'ArrowDown') {
+    state.selectedIdx = Math.min(state.selectedIdx + 1, visibleCount - 1);
+    updateSelectionHighlight();
+    e.preventDefault();
+  } else if (e.key === 'ArrowUp') {
+    state.selectedIdx = Math.max(state.selectedIdx - 1, 0);
+    updateSelectionHighlight();
+    e.preventDefault();
+  } else if (e.key === 'Enter') {
+    const clip = filterClips()[state.selectedIdx];
+    if (clip) copyClip(clip, !e.shiftKey);
+    e.preventDefault();
+  } else if (e.key === 'Escape') {
+    window.close();
+  }
 });
 
 els.openPanel.addEventListener('click', async () => {
@@ -147,22 +206,26 @@ els.openPanel.addEventListener('click', async () => {
     window.close();
   } catch (err) {
     console.warn('open side panel failed', err);
+    showToast('Side panel not available');
   }
 });
 
-els.pause.addEventListener('click', async () => {
-  const { paused } = await chrome.runtime.sendMessage({ type: MSG.GET_PAUSE_STATE });
-  if (paused) {
+async function togglePause() {
+  if (state.paused) {
     await chrome.runtime.sendMessage({ type: MSG.RESUME });
-    els.pause.textContent = 'Pause';
+    state.paused = false;
   } else {
     await chrome.runtime.sendMessage({
       type: MSG.PAUSE,
       payload: { until: Date.now() + 10 * 60 * 1000 },
     });
-    els.pause.textContent = 'Resume';
+    state.paused = true;
   }
-});
+  updatePauseUI();
+}
+
+els.pause.addEventListener('click', togglePause);
+els.resumeBanner.addEventListener('click', togglePause);
 
 els.settings.addEventListener('click', () => {
   chrome.runtime.openOptionsPage();
@@ -177,6 +240,5 @@ chrome.runtime.onMessage.addListener((msg) => {
 
 renderFilters();
 loadClips();
-chrome.runtime.sendMessage({ type: MSG.GET_PAUSE_STATE }).then((s) => {
-  if (s?.paused) els.pause.textContent = 'Resume';
-}).catch(() => {});
+refreshPauseState();
+els.search.focus();

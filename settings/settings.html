@@ -27,6 +27,14 @@
             <input type="checkbox" id="ai-enabled" checked />
             Use on-device AI for topic tagging (Gemini Nano)
           </label>
+          <p class="hint">
+            Status:
+            <span id="ai-status" class="ai-status unknown">checking…</span>
+            <span id="ai-help" hidden>
+              — needs Chrome 127+ with Gemini Nano enabled.
+              <a href="https://developer.chrome.com/docs/ai/built-in" target="_blank">Setup guide</a>
+            </span>
+          </p>
         </div>
         <div class="row">
           <label for="blocklist">Blocked domains (one per line)</label>

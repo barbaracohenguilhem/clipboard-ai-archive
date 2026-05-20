@@ -15,6 +15,7 @@ export const MSG = {
   PAUSE: 'capture:pause',
   RESUME: 'capture:resume',
   GET_PAUSE_STATE: 'capture:get-pause-state',
+  GET_AI_STATUS: 'ai:status',
 };
 
 export const SETTINGS_KEY = 'clipboard-archive-settings';

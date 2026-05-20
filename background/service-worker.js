@@ -1,5 +1,5 @@
 import { processClipboardEvent } from './capture-pipeline.js';
-import { tagClip } from './tagger.js';
+import { tagClip, isAvailable as isAiAvailable } from './tagger.js';
 import { runRetention } from './retention.js';
 import { listRecent, deleteClip, updateTags, setPinned } from './storage.js';
 import { sha1 } from '../shared/hash.js';
@@ -132,6 +132,9 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       return true;
     case MSG.GET_PAUSE_STATE:
       getPauseState().then(sendResponse);
+      return true;
+    case MSG.GET_AI_STATUS:
+      isAiAvailable().then((available) => sendResponse({ available }));
       return true;
   }
 });
