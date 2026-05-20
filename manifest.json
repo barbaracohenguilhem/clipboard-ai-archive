@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Clipboard AI Archive",
+  "version": "0.1.0",
+  "description": "Privacy-first clipboard archive with on-device AI categorization.",
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Clipboard AI Archive",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png",
+      "128": "assets/icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
+  "options_page": "settings/settings.html",
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+  "permissions": [
+    "clipboardRead",
+    "clipboardWrite",
+    "storage",
+    "offscreen",
+    "sidePanel",
+    "notifications",
+    "activeTab",
+    "alarms",
+    "downloads"
+  ],
+  "host_permissions": [],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+V",
+        "mac": "Command+Shift+V"
+      },
+      "description": "Open clipboard archive"
+    }
+  },
+  "minimum_chrome_version": "127"
+}
