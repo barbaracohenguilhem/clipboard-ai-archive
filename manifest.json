@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Clipboard AI Archive",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Privacy-first clipboard archive with on-device AI categorization.",
   "background": {
     "service_worker": "background/service-worker.js",

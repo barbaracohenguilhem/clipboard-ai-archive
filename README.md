@@ -40,11 +40,23 @@ The first time, Chrome will ask permission to read your clipboard — accept.
 
 ```bash
 npm install      # one-time
-npm test         # run unit tests
+npm test         # run unit tests (52 passing)
 npm run test:watch
+npm run icons    # regenerate PNGs from assets/icon.svg
+npm run package  # build dist/clipboard-archive-vX.Y.Z.zip for the Web Store
 ```
 
 Reload the extension at `chrome://extensions/` after editing files.
+After reloading, also reload any open tabs so the content script gets re-injected.
+
+## Publish to the Chrome Web Store
+
+1. Bump `version` in `manifest.json` and update `CHANGELOG.md`
+2. Run `npm run package` to build the store-ready zip
+3. Follow the checklist in [STORE.md](STORE.md) — listing copy, permission justifications, screenshots, privacy policy URL
+4. Upload at https://chrome.google.com/webstore/devconsole/ ($5 one-time developer fee)
+
+[PRIVACY.md](PRIVACY.md) is the policy text you'll link to from the listing.
 
 ## Architecture
 
