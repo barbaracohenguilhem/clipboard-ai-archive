@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Clipboard — Demo</title>
+    <link rel="stylesheet" href="../../popup/popup.css" />
+    <style>
+      /* Screenshot frame */
+      body.demo-frame {
+        width: 1280px;
+        height: 800px;
+        max-height: none;
+        margin: 0;
+        padding: 60px;
+        background: linear-gradient(135deg, #f0f4ff 0%, #e3ebff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 30px;
+        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      }
+      .demo-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #111;
+        margin: 0;
+      }
+      .demo-sub {
+        font-size: 14px;
+        color: #555;
+        margin: 0;
+      }
+      .extension-frame {
+        width: 360px;
+        max-height: 600px;
+        background: var(--bg);
+        color: var(--fg);
+        border-radius: 12px;
+        box-shadow: 0 24px 60px rgba(20, 50, 130, 0.18), 0 4px 12px rgba(20, 50, 130, 0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body class="demo-frame">
+    <div>
+      <p class="demo-title" style="text-align:center;">Clipboard AI Archive</p>
+      <p class="demo-sub" style="text-align:center;">Everything you copy, tagged automatically, on-device</p>
+    </div>
+
+    <div class="extension-frame">
+      <header>
+        <input id="search" type="search" value="" placeholder="Search clipboard…" />
+        <div id="filters">
+          <button class="chip active">All</button>
+          <button class="chip">URL</button>
+          <button class="chip">Code</button>
+          <button class="chip">Color</button>
+          <button class="chip">Email</button>
+        </div>
+      </header>
+      <main>
+        <ul id="clip-list">
+          <li class="clip selected">
+            <div class="clip-meta">
+              <span>URL · 2m ago</span>
+              <span>📌</span>
+            </div>
+            <div class="clip-text">https://figma.com/file/abc123/Project-Alpha-Design-System</div>
+            <div class="clip-tags">
+              <span class="clip-tag">#design</span>
+              <span class="clip-tag">#figma</span>
+              <span class="clip-tag">#project-alpha</span>
+            </div>
+            <div class="clip-source">figma.com</div>
+          </li>
+          <li class="clip">
+            <div class="clip-meta">
+              <span>Code · 12m ago</span>
+              <span></span>
+            </div>
+            <div class="clip-text">const usePersistedState = (key, initial) => {</div>
+            <div class="clip-tags">
+              <span class="clip-tag">#react</span>
+              <span class="clip-tag">#hooks</span>
+            </div>
+            <div class="clip-source">react.dev</div>
+          </li>
+          <li class="clip">
+            <div class="clip-meta">
+              <span>Color · 34m ago</span>
+              <span></span>
+            </div>
+            <div class="clip-text">#2b6cff</div>
+            <div class="clip-tags">
+              <span class="clip-tag">#brand-color</span>
+            </div>
+            <div class="clip-source">tailwindcss.com</div>
+          </li>
+          <li class="clip">
+            <div class="clip-meta">
+              <span>Text · 1h ago</span>
+              <span></span>
+            </div>
+            <div class="clip-text">The new clipboard manager respects your privacy by keeping everything on-device. No cloud, no analytics, no third parties.</div>
+            <div class="clip-tags">
+              <span class="clip-tag">#blog-draft</span>
+            </div>
+            <div class="clip-source">notion.so</div>
+          </li>
+          <li class="clip">
+            <div class="clip-meta">
+              <span>Email · 2h ago</span>
+              <span></span>
+            </div>
+            <div class="clip-text">designer@studio.example.com</div>
+            <div class="clip-source">linkedin.com</div>
+          </li>
+        </ul>
+      </main>
+      <footer>
+        <button>Open full view</button>
+        <button>Pause</button>
+        <button>Settings</button>
+      </footer>
+    </div>
+  </body>
+</html>

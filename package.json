@@ -8,10 +8,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "icons": "node scripts/gen-icons.mjs",
+    "screenshots": "node scripts/screenshots.mjs",
     "package": "node scripts/package.mjs"
   },
   "devDependencies": {
     "fake-indexeddb": "^6.2.5",
+    "playwright": "^1.60.0",
     "sharp": "^0.34.5",
     "vitest": "^4.1.6"
   }

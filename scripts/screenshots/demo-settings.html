@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Settings — Demo</title>
+    <link rel="stylesheet" href="../../settings/settings.css" />
+    <style>
+      body { background: linear-gradient(135deg, #f0f4ff 0%, #e3ebff 100%); }
+      main {
+        background: white;
+        border-radius: 16px;
+        padding: 40px 48px;
+        margin: 60px auto;
+        max-width: 600px;
+        box-shadow: 0 24px 60px rgba(20, 50, 130, 0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Clipboard Archive</h1>
+      <p class="subtle">Privacy-first clipboard history with on-device AI tagging.</p>
+
+      <section>
+        <h2>Capture</h2>
+        <div class="row">
+          <label for="retention">Auto-delete unpinned clips after</label>
+          <select id="retention">
+            <option>90 days</option>
+          </select>
+        </div>
+        <div class="row">
+          <label class="inline">
+            <input type="checkbox" checked />
+            Use on-device AI for topic tagging (Gemini Nano)
+          </label>
+          <p class="hint">
+            Status: <span class="ai-status ok">available</span>
+          </p>
+        </div>
+        <div class="row">
+          <label for="blocklist">Blocked domains (one per line)</label>
+          <textarea rows="5">accounts.google.com
+mybank.example.com</textarea>
+          <p class="hint">Clipboard content from these domains is never captured. Password manager and bank domains are always blocked by default.</p>
+        </div>
+        <div class="row">
+          <button class="primary">Save</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Data</h2>
+        <div class="row buttons">
+          <button>Export all as JSON</button>
+          <button>Import from JSON</button>
+        </div>
+        <div class="row">
+          <button class="danger">Delete all clipboard history</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>About</h2>
+        <p class="subtle">
+          Keyboard shortcut: <kbd>Cmd + Shift + V</kbd> opens the popup.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

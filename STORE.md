@@ -140,7 +140,11 @@ The Chrome Web Store dashboard will ask a series of questions. Use these answers
 - **Do you transfer user data to third parties?** No
 - **Do you use user data to determine creditworthiness?** No
 
-**Privacy policy URL:** Paste the URL where `PRIVACY.md` is hosted (e.g. a GitHub raw URL, or your own site).
+**Privacy policy URL:**
+```
+https://gist.github.com/barbaracohenguilhem/8551947fa4c1d801d67be56933f3a255
+```
+(Hosted as a public GitHub gist on 2026-05-19. Update via `gh gist edit <id>` if you change `PRIVACY.md`.)
 
 ---
 
